@@ -26,6 +26,7 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import queries.DependencyGraph;
 import queries.sql.v1.QueryGenerationConf;
 import ref.RuleListener;
 import ref.schemaLexer;
@@ -87,9 +88,9 @@ public class Main {
                 .map(Rule::toString).iterator();
         Files.write(Paths.get("example.tex"), it);*/
 
-        /*System.err.println("INFO: detecting cycles");
+        System.err.println("INFO: detecting cycles");
         DependencyGraph dg = new DependencyGraph(classListener);
-        dg.plot();*/
+        dg.plot();
     }
 
     public static void main(String args[]) throws IOException {

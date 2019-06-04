@@ -104,8 +104,6 @@ public class DependencyGraph {
     }
 
     public DependencyGraph(RuleListener l) throws IOException {
-        QueryGenerationConf qgc = new QueryGenerationConf();
-
         graph = new DefaultDirectedWeightedGraph<>(Edge.class);
         getPredicates = l.schema.keySet();
         for (String x : getPredicates) {
@@ -113,7 +111,6 @@ public class DependencyGraph {
         }
         graph.addVertex("_bot_");
         Iterator<Map.Entry<Integer, Rule>> it = l.ruleTabClassification4DB.values().stream().flatMap(x -> x.entrySet().stream()).iterator();
-        int c = 0;
         while (it.hasNext()) {
             Map.Entry<Integer, Rule> cp = it.next();
             int ruleId = cp.getKey();
@@ -138,7 +135,6 @@ public class DependencyGraph {
                     e.putRuleId(ruleId);
                 }
             }
-            c++;
         }
 
         graph.edgeSet().forEach(x -> {

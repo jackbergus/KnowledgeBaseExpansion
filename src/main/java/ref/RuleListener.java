@@ -84,7 +84,7 @@ public class RuleListener implements schemaListener {
 				HashMap<String, String> conversion = ruleToResolvedPredicates.get(ruleId);
 				qc.add(macroQuery.copy().instantiateQuery(conversion));
 			}*/
-			System.out.println(r+"\n================================================\n"+macroQuery.transformFromLegacy().toString(xyz)+"\n\n\n");
+			System.out.println(tabId+") "+r+"\n================================================\n"+macroQuery.transformFromLegacy().toString(xyz)+"\n\n\n");
 
 		}
 	}
