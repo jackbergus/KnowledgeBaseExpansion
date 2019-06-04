@@ -4,17 +4,15 @@ program : (commands ';')* commands '.';
 
 commands : (RELATION|EVENT) STRING LPAR stringlist RPAR                            #rel_delcare
          | FD FOR STRING DECLARE stringlist MARROW stringlist                      #fdep_declare
-         | fol_two+ FOR LPAR commands+ RPAR                                        #fol_two_multiple_binds
          | RULE moreClauses (WITH predicates+)? IMPLIES (moreClauses | BOT)        #rule
          | ENTITY EXIST (stringlist)? except? intime inspace?                      #enexists
          | MACRO STRING LPAR stringlist RPAR DECLARE STRING COMMA
            RULE moreClauses (WITH predicates+)? IMPLIES (moreClauses | BOT)        #macro_definition
          | TRYEXPAND stringlist (FOR (RELATION|EVENT))?                            #macro_expand
-         | UNIQUE? (BEGIN|END) STRING LPAR orig=stringlist RPAR intime                  #beginend_declare
+         | UNIQUE? (BEGIN|END) STRING LPAR orig=stringlist RPAR intime             #beginend_declare
          | TRANSFER STRING LPAR orig=stringlist RPAR intime DECLARE dest=stringlist  #transfer_macro
          ;
 
-fol_two: BIND variable=STRING DECLARE LPAR stringlist RPAR;
 except : EXCEPT stringlist;
 intime : 'in time' stringlist;
 inspace : 'and space' stringlist;
@@ -46,7 +44,6 @@ angestrengend : STRING #isstring
 lbound : STRING (LT | LEQ) ;
 ubound : (GT | GEQ) STRING ;
 
-BIND : 'bind';
 TRANSFER : 'transfer';
 TRYEXPAND : 'try-expand';
 RELATION : 'relation' ;
@@ -79,7 +76,7 @@ NEG : '~';
 BOT : 'False';
 VALUE  : '"' STRING '"';
 STRING :  CHAR_NO_NL+ ;
-fragment CHAR_NO_NL : 'a'..'z'|'A'..'Z';
+fragment CHAR_NO_NL : 'a'..'z'|'A'..'Z'|'.';
 WS
     : [ \t\r\n]+ -> channel(HIDDEN)
 ;

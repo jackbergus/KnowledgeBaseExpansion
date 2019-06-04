@@ -42,18 +42,6 @@ public interface schemaListener extends ParseTreeListener {
 	 */
 	void exitFdep_declare(schemaParser.Fdep_declareContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code fol_two_multiple_binds}
-	 * labeled alternative in {@link schemaParser#commands}.
-	 * @param ctx the parse tree
-	 */
-	void enterFol_two_multiple_binds(schemaParser.Fol_two_multiple_bindsContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code fol_two_multiple_binds}
-	 * labeled alternative in {@link schemaParser#commands}.
-	 * @param ctx the parse tree
-	 */
-	void exitFol_two_multiple_binds(schemaParser.Fol_two_multiple_bindsContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code rule}
 	 * labeled alternative in {@link schemaParser#commands}.
 	 * @param ctx the parse tree
@@ -125,16 +113,6 @@ public interface schemaListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitTransfer_macro(schemaParser.Transfer_macroContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link schemaParser#fol_two}.
-	 * @param ctx the parse tree
-	 */
-	void enterFol_two(schemaParser.Fol_twoContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link schemaParser#fol_two}.
-	 * @param ctx the parse tree
-	 */
-	void exitFol_two(schemaParser.Fol_twoContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link schemaParser#except}.
 	 * @param ctx the parse tree

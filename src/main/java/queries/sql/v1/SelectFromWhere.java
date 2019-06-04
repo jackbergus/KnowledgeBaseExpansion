@@ -23,6 +23,8 @@ package queries.sql.v1;
 
 import algos.CopyConstructor;
 import queries.bitmaps.BitMap;
+import queries.sql.SqlUtils;
+import queries.sql.v2.MultipleNestedCases;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -38,7 +40,7 @@ public class SelectFromWhere implements CopyConstructor<SelectFromWhere> {
     HashMap<String, String> selectArgumentToValue;
 
     // FROM
-    List<String> tablesWithRenaming;
+    List<String> tablesWithRenaming, renamings;
 
     // WHERE
     List<WhereJoinCondition> clauseJoins;
@@ -49,6 +51,7 @@ public class SelectFromWhere implements CopyConstructor<SelectFromWhere> {
 
     public SelectFromWhere(HashMap<String, String> selectionMap,
                            List<String> fromTables,
+                           List<String> tableRenamings,
                            List<WhereJoinCondition> wjcLsAND,
                            List<WhereEqValueCondition> selectSpecificERTypes,
                            HashMap<String, BitMap> notNullMaps,
@@ -70,15 +73,21 @@ public class SelectFromWhere implements CopyConstructor<SelectFromWhere> {
 
         this.selectArgumentToValue = selectionMap;
         this.tablesWithRenaming = fromTables;
+        this.renamings = tableRenamings;
         this.clauseJoins = wjcLsAND;
         this.selectSpecificERTypes = selectSpecificERTypes;
         this.notNullMaps = notNullMaps;
         this.negatedMaps = negatedMaps;
-        this.generateIfNotExists = new QueryCollection(SetOperations.UNION, true, nexExpectedSize);
+        this.generateIfNotExists = new QueryCollection(SetOperations.UNION, false, nexExpectedSize);
+    }
+
+    public MultipleNestedCases transformFromLegacy() {
+        return new MultipleNestedCases(selectArgumentToValue, tablesWithRenaming, renamings, clauseJoins, selectSpecificERTypes, notNullMaps, negatedMaps, generateIfNotExists);
     }
 
     public SelectFromWhere(HashMap<String, String> selectionMap,
                            List<String> fromTables,
+                           List<String> tableRenamings,
                            List<WhereJoinCondition> wjcLsAND,
                            List<WhereEqValueCondition> selectSpecificERTypes,
                            HashMap<String, BitMap> notNullMaps,
@@ -100,6 +109,7 @@ public class SelectFromWhere implements CopyConstructor<SelectFromWhere> {
 
         this.selectArgumentToValue = selectionMap;
         this.tablesWithRenaming = fromTables;
+        this.renamings = tableRenamings;
         this.clauseJoins = wjcLsAND;
         this.selectSpecificERTypes = selectSpecificERTypes;
         this.notNullMaps = notNullMaps;
@@ -107,6 +117,11 @@ public class SelectFromWhere implements CopyConstructor<SelectFromWhere> {
         this.generateIfNotExists = generateIfNotExists;
     }
 
+    /**
+     *
+     * @param map       Map associating the element from the general clause to the specific instantiation given by the associated rule
+     * @return
+     */
     public SelectFromWhere instantiateQuery(HashMap<String, String> map) {
         selectSpecificERTypes.forEach(x -> {
             String key = x.value.replace("'","");
@@ -129,14 +144,7 @@ public class SelectFromWhere implements CopyConstructor<SelectFromWhere> {
         List<String> selectStatement = generateSelectArguments(selectArgumentToValue);
 
         // Defining the AND predicates
-        List<String> whereJoinAndConditions = new ArrayList<>();
-        selectSpecificERTypes.forEach(x -> whereJoinAndConditions.add(x.toString()));
-        notNullMaps.forEach((x,y)-> whereJoinAndConditions.add("(~"+x+"."+properties.getProperty("null")+") &"+y.toString()));
-        negatedMaps.forEach((x,y)-> whereJoinAndConditions.add("("+x+"."+properties.getProperty("negated")+") &"+y.toString()));
-        clauseJoins.forEach(x -> whereJoinAndConditions.add(x.toString()));
-        if (!generateIfNotExists.isEmpty()) {
-            whereJoinAndConditions.add("NOT EXISTS("+generateIfNotExists.toString()+")");
-        }
+        List<String> whereJoinAndConditions = SqlUtils.getWhereJoinAndConditions(properties, selectSpecificERTypes, notNullMaps, negatedMaps, clauseJoins, generateIfNotExists);
 
         return "SELECT " + (selectStatement.isEmpty() ? "*" : String.join(",\n       ", selectStatement)) +
                 // Selecting the table concurring in the join
@@ -153,6 +161,7 @@ public class SelectFromWhere implements CopyConstructor<SelectFromWhere> {
     private List<String> generateSelectArguments(HashMap<String, String> map) {
         ArrayList<String> toReturn = new ArrayList<>();
         arguments.forEach(x -> toReturn.add(map.get(x)+" AS "+x));
+        toReturn.set(0, renamings.stream().map(x -> x+".eid").collect(Collectors.joining(" || "))+" AS eid");
         return toReturn;
     }
 
@@ -160,6 +169,6 @@ public class SelectFromWhere implements CopyConstructor<SelectFromWhere> {
     public SelectFromWhere copy() {
         HashMap<String, String> sa = new HashMap<>();
         sa.putAll(selectArgumentToValue);
-        return new SelectFromWhere(sa,tablesWithRenaming, clauseJoins, CopyConstructor.listCopy(selectSpecificERTypes),notNullMaps, negatedMaps, generateIfNotExists.copy());
+        return new SelectFromWhere(sa,tablesWithRenaming, renamings, clauseJoins, CopyConstructor.listCopy(selectSpecificERTypes),notNullMaps, negatedMaps, generateIfNotExists.copy());
     }
 }

@@ -22,24 +22,21 @@
 package queries;
 
 import com.google.common.collect.HashMultimap;
-import org.graphstream.graph.Edge;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.MultiGraph;
-import org.graphstream.graph.implementations.SingleGraph;
-import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.cycle.TarjanSimpleCycles;
 import org.jgrapht.alg.shortestpath.AllDirectedPaths;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultDirectedWeightedGraph;
-import ref.Listener;
+import queries.sql.v1.QueryGenerationConf;
+import ref.RuleListener;
 import types.Rule;
 
 import java.io.IOException;
 import java.rmi.UnexpectedException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 // Strong assumption: there are predicates that have
 
@@ -106,7 +103,7 @@ public class DependencyGraph {
         }
     }
 
-    public DependencyGraph(Listener l) throws IOException {
+    public DependencyGraph(RuleListener l) throws IOException {
         QueryGenerationConf qgc = new QueryGenerationConf();
 
         graph = new DefaultDirectedWeightedGraph<>(Edge.class);

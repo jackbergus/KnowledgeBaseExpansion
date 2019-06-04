@@ -52,18 +52,6 @@ public class schemaBaseListener implements schemaListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterFol_two_multiple_binds(schemaParser.Fol_two_multiple_bindsContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitFol_two_multiple_binds(schemaParser.Fol_two_multiple_bindsContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterRule(schemaParser.RuleContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -131,18 +119,6 @@ public class schemaBaseListener implements schemaListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitTransfer_macro(schemaParser.Transfer_macroContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterFol_two(schemaParser.Fol_twoContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitFol_two(schemaParser.Fol_twoContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

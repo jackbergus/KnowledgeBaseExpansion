@@ -19,7 +19,7 @@
  */
 
  
-package queries;
+package queries.sql.v1;
 
 import algos.Substitute;
 import queries.bitmaps.BitMap;
@@ -137,6 +137,7 @@ public class QueryGenerationConf {
             return null;
         }
 
+        // Associating into the bitmap whether the final result should be negated, too.
         BitMap resultNegated = new BitMap(Integer.valueOf(properties.getProperty("negatedS")));
         if (r.head.get(0).isNegated) {
             resultNegated.on(0);
@@ -188,9 +189,11 @@ public class QueryGenerationConf {
 
         // Tables from which you have to extract the arguments
         List<String> fromTables = new ArrayList<>();
+        List<String> tableRenamings = new ArrayList<>();
         List<WhereEqValueCondition> selectSpecificERTypes = new ArrayList<>();
         r.body.forEach(x -> {
             fromTables.add(properties.getProperty("tupleTable")+" "+getTableName(x.prop.relName));
+            tableRenamings.add(getTableName(x.prop.relName));
             selectSpecificERTypes.add(new WhereEqValueCondition(getTableName(x.prop.relName), properties.getProperty("type"), "'"+x.prop.relName+"'"));
         });
 
@@ -230,7 +233,11 @@ public class QueryGenerationConf {
                     for (int i = 0; i < N-1; i++) {
                         CompPair<String, String> left = getJoinConditionForSQL(toJoin.get(i));
                         CompPair<String, String> right = getJoinConditionForSQL(toJoin.get(i + 1));
-                        wjcLsAND.add( new WhereJoinCondition(left.key, left.val, right.key, right.val));
+                        if (!((!tableRenamings.contains(left.key)) || (!tableRenamings.contains(right.key)))) {
+                            //System.err.println("ERROR: join condition that is not reflected into a resulting table. Killing");
+                            //return null;
+                            wjcLsAND.add( new WhereJoinCondition(left.key, left.val, right.key, right.val));
+                        }
                     }
                 //}
             //}
@@ -258,6 +265,7 @@ public class QueryGenerationConf {
 
         return new SelectFromWhere(selectionMap,
                                    fromTables,
+                                    tableRenamings,
                                    wjcLsAND, selectSpecificERTypes, notNullMaps, negatedMaps,
                     0);
     }

@@ -28,7 +28,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import queries.QueryGenerationConf;
+import queries.sql.v1.QueryGenerationConf;
 import queries.sql.v1.QueryCollection;
 import queries.sql.v1.SelectFromWhere;
 import queries.sql.v1.SetOperations;
@@ -37,13 +37,14 @@ import types.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This class provides an empty implementation of {@link schemaListener},
  * which can be extended to create a listener which only needs to handle a subset
  * of the available methods.
  */
-public class Listener implements schemaListener {
+public class RuleListener implements schemaListener {
 
 	public HashMap<Rule, Integer> ruleTabToId;
 	public HashMap<String, Schema> schema;
@@ -72,13 +73,18 @@ public class Listener implements schemaListener {
 			if (macroQuery == null)
 				continue; // TODO: implement this case
 			int tabId = ruleTabToId.get(r);
-			HashMap<Integer, Rule> m = ruleTabClassification4DB.get(tabId);
-			QueryCollection qc = new QueryCollection(SetOperations.UNION, true, m.size());
+
+			Stream<HashMap<String, String>> xyz = ruleTabClassification4DB.get(ruleTabToId.get(r)).keySet().stream().map(ruleToResolvedPredicates::get);
+
+
+
+			/*HashMap<Integer, Rule> m = ruleTabClassification4DB.get(tabId);
+			QueryCollection qc = new QueryCollection(SetOperations.UNION, false, m.size());
 			for (Integer ruleId : ruleTabClassification4DB.get(tabId).keySet()) {
 				HashMap<String, String> conversion = ruleToResolvedPredicates.get(ruleId);
 				qc.add(macroQuery.copy().instantiateQuery(conversion));
-			}
-			System.out.println(r+"\n================================================\n"+qc+"\n\n\n");
+			}*/
+			System.out.println(r+"\n================================================\n"+macroQuery.transformFromLegacy().toString(xyz)+"\n\n\n");
 
 		}
 	}
@@ -848,15 +854,6 @@ public class Listener implements schemaListener {
 	@Override public void exitBeginend_declare(schemaParser.Beginend_declareContext ctx) 	{}
 	@Override public void exitTransfer_macro(schemaParser.Transfer_macroContext ctx)        {}
 
-	@Override
-	public void enterFol_two(schemaParser.Fol_twoContext ctx) {
-
-	}
-
-	@Override
-	public void exitFol_two(schemaParser.Fol_twoContext ctx) {
-
-	}
 
 	@Override public void enterSet_relation(schemaParser.Set_relationContext ctx) 			{}
 	@Override public void exitSet_relation(schemaParser.Set_relationContext ctx) 			{}
@@ -890,16 +887,6 @@ public class Listener implements schemaListener {
 	@Override public void enterEveryRule(ParserRuleContext ctx)                  			{}
 	@Override public void exitEnexists(schemaParser.EnexistsContext ctx)         			{}
 	@Override public void exitFdep_declare(schemaParser.Fdep_declareContext ctx) 			{}
-
-	@Override
-	public void enterFol_two_multiple_binds(schemaParser.Fol_two_multiple_bindsContext ctx) {
-
-	}
-
-	@Override
-	public void exitFol_two_multiple_binds(schemaParser.Fol_two_multiple_bindsContext ctx) {
-
-	}
 
 	@Override public void exitRel_delcare(schemaParser.Rel_delcareContext ctx)   			{}
 	@Override public void enterStringlist(schemaParser.StringlistContext ctx)    			{}

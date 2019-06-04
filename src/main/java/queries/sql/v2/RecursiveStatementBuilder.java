@@ -34,7 +34,12 @@ import java.util.stream.IntStream;
 
 public class RecursiveStatementBuilder {
     private final Properties properties;
+
+    /**
+     * Fields associated to the returned element. This property is configured via property file
+     */
     private String[] outerSelectFields;
+
     private HashMultimap<List<? extends WhereEqValueCondition>, Proposition> casus;
     private String nullValue;
     public int maximumNumberOfSelfJoins;
@@ -64,23 +69,23 @@ public class RecursiveStatementBuilder {
         return maximumNumberOfSelfJoins;
     }
 
-    public String getIthTableJoin(int i) {
+    /*public String getIthTableJoin(int i) {
         return properties.getProperty("expansionTableName")+" t"+i;
-    }
+    }*/
 
     public void addCasus(List<? extends WhereEqValueCondition> condition, Proposition toJsonBuildArray) {
         casus.put(condition, toJsonBuildArray);
     }
 
-    public String toJsonBuildArray(Proposition y) {
+    private String toJsonBuildArray(Proposition y) {
         return "json_build_array('" + y.relName + "'" + y.args.stream().map(x -> x.value == null || x.value.equals(nullValue) ? nullValue : (x.isVariable ? x.value : ("'"+x.value+"'"))) + ")";
     }
 
-    public String listAllTheCases(Collection<Proposition> casi) {
+    private String listAllTheCases(Collection<Proposition> casi) {
         return "ARRAY[" + casi.stream().map(this::toJsonBuildArray).collect(Collectors.joining(",")) +"]";
     }
 
-    public String caseToString(Map.Entry<List<? extends WhereEqValueCondition>, Collection<Proposition>> caseWhenThen) {
+    private String caseToString(Map.Entry<List<? extends WhereEqValueCondition>, Collection<Proposition>> caseWhenThen) {
         return "WHEN " + caseWhenThen.getKey() +" THEN "+ listAllTheCases(caseWhenThen.getValue());
     }
 
